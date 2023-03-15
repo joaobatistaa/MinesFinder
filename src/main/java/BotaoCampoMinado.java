@@ -14,7 +14,6 @@ public class BotaoCampoMinado extends JButton {
         this.linha = linha;
         this.coluna = coluna;
     }
-    //teste
 
     public void setEstado(int estado) {
         this.estado = estado;
