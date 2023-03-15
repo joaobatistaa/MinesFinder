@@ -1,11 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class BotaoCampoMinado extends JButton {
     private int estado;
+    private int linha;
+    private int coluna;
 
-    public BotaoCampoMinado() {
+    public BotaoCampoMinado(int linha, int coluna) {
         this.estado = CampoMinado.TAPADO;
+
+        this.linha = linha;
+        this.coluna = coluna;
     }
 
     public void setEstado(int estado) {
@@ -24,6 +31,13 @@ public class BotaoCampoMinado extends JButton {
                 setText(String.valueOf(estado));
                 setBackground(Color.LIGHT_GRAY);
         }
+    }
+
+    public int getLinha() {
+        return linha;
+    }
+    public int getColuna() {
+        return coluna;
     }
 }
 

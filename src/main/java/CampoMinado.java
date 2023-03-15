@@ -1,4 +1,8 @@
+import javax.swing.*;
+import java.util.EmptyStackException;
 import java.util.Random;
+
+import static java.lang.System.currentTimeMillis;
 
 public class CampoMinado {
 
@@ -16,6 +20,8 @@ public class CampoMinado {
     private boolean jogoTerminado;
     private boolean jogadorDerrotado;
     private boolean primeiraJogada;
+    private long instanteInicioJogo;
+    private long duracaoJogo;
 
     public CampoMinado(int nrLinhas, int nrColunas, int nrMinas) {
         this.nrLinhas = nrLinhas;
@@ -42,12 +48,25 @@ public class CampoMinado {
         if (primeiraJogada) {
             primeiraJogada = false;
             colocarMinas(x, y);
+
+            instanteInicioJogo = System.currentTimeMillis();
         }
+
+        // MOSTRAR DURAÇÃO ATUAL DO JOGO
 
         if (minas[x][y] == true) {
             estado[x][y] = REBENTADO;
             jogoTerminado = true;
             jogadorDerrotado = true;
+            duracaoJogo = System.currentTimeMillis() - instanteInicioJogo;
+            // MOSTRAR DURAÇÃO DO JOGO
+        } else {
+            if (isVitoria()){
+                jogoTerminado = true;
+                jogadorDerrotado = false;
+                duracaoJogo = System.currentTimeMillis() - instanteInicioJogo;
+                // MOSTRAR DURAÇÃO DO JOGO
+            }
         }
 
         int minasVizinhas = contarMinasVizinhas(x, y);
@@ -55,11 +74,22 @@ public class CampoMinado {
         if (minasVizinhas == 0) {
             estado[x][y] = VAZIO;
             revelarQuadriculasVizinhas(x, y);
+        } else {
+            for (var i = Math.max(0, x - 1); i < Math.min(nrLinhas, x + 2); ++i) {
+                for (var j = Math.max(0, y - 1); j < Math.min(nrColunas, y + 2); ++j)
+                {
+                    if (minas[i][j]) {
+                        estado[i][j] = VAZIO;
+                        revelarQuadriculasVizinhas(x, y);
+                    }
+                }
+            }
         }
+
         // Faz aqui qualquer coisa...
     }
 
-    private int contarMinasVizinhas(int x, int y) {
+    public int contarMinasVizinhas(int x, int y) {
         var numMinasVizinhas = 0;
         for (var i = Math.max(0, x - 1); i < Math.min(nrLinhas, x + 2); ++i) {
             for (var j = Math.max(0, y - 1); j < Math.min(nrColunas, y + 2); ++j)
@@ -72,21 +102,28 @@ public class CampoMinado {
         return numMinasVizinhas;
     }
 
-    private void revelarQuadriculasVizinhas(int x, int y) {
+    public void revelarQuadriculasVizinhas(int x, int y) {
         for (var i = Math.max(0, x - 1); i < Math.min(nrLinhas, x + 2); ++i) {
             for (var j = Math.max(0, y - 1); j < Math.min(nrColunas, y + 2); ++j)
             {
-                if (minas[i][j]) {
-                    if (isVitoria() == false){
-                        jogadorDerrotado = true;
+                if (estado[i][j] == TAPADO) {
+                    if (minas[i][j] == true) {
+                        estado[i][j] = REBENTADO;
                         jogoTerminado = true;
+                        jogadorDerrotado = true;
+                    } else {
+                        estado[i][j] = VAZIO;
+                        if (isVitoria()) {
+                            jogoTerminado = true;
+                            jogadorDerrotado = false;
+                        }
                     }
                 }
             }
         }
     }
 
-    private void colocarMinas(int exceptoX, int exceptoY) {
+    public void colocarMinas(int exceptoX, int exceptoY) {
         var aleatorio = new Random();
         var x = 0;
         var y = 0;
@@ -99,7 +136,7 @@ public class CampoMinado {
         }
     }
 
-    private boolean isVitoria() {
+    public boolean isVitoria() {
         for (int i = 0; i < nrLinhas; ++i) {
             for (var j = 0 ; j < nrColunas; ++j) {
                 if (!minas[i][j] && estado[i][j] >= TAPADO) {
@@ -110,18 +147,41 @@ public class CampoMinado {
         return true;
     }
 
-    private void marcarComoTendoMina(int x, int y) {
+    public long getDuracaoJogo() {
+        if (primeiraJogada) {
+            return 0;
+        }
+        if (!jogoTerminado) {
+            return System.currentTimeMillis() - instanteInicioJogo;
+        }
+
+        return duracaoJogo;
+    }
+
+    public void marcarComoTendoMina(int x, int y) {
         if (estado[x][y] == TAPADO || estado[x][y] == DUVIDA) {
             estado[x][y] = MARCADO;
         }
     }
 
-    private boolean isJogoTerminado() {
-        return this.jogoTerminado;
+    public void marcarComoSuspeita(int x, int y) {
+        if (estado[x][y] == MARCADO || estado[x][y] == DUVIDA) {
+            estado[x][y] = TAPADO;
+        }
     }
 
-    private boolean isJogadorDerrotado() {
-        return this.jogadorDerrotado;
+    public void desmarcarQuadricula(int x, int y) {
+        if (estado[x][y] == TAPADO || estado[x][y] == MARCADO) {
+            estado[x][y] = DUVIDA;
+        }
+    }
+
+    public boolean isJogoTerminado() {
+        return jogoTerminado;
+    }
+
+    public boolean isJogadorDerrotado() {
+        return jogadorDerrotado;
     }
 
     public int getEstadoQuadricula(int x, int y) {
