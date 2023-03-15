@@ -1,8 +1,5 @@
-import javax.swing.*;
-import java.util.EmptyStackException;
+//@João Batista
 import java.util.Random;
-
-import static java.lang.System.currentTimeMillis;
 
 public class CampoMinado {
 

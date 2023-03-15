@@ -19,6 +19,11 @@ public class MinesFinder extends JFrame {
     private JButton botaoSair;
     private JButton botaoJogoFacil;
 
+    private TabelaRecordes recordesFacil;
+    private TabelaRecordes recordesMedio;
+    private TabelaRecordes recordesDificil;
+
+
     public MinesFinder(String title) {
         super(title);
 
@@ -38,12 +43,12 @@ public class MinesFinder extends JFrame {
         System.exit(0);
     }
     private void btnJogoFacilActionPerformed(ActionEvent e) {
-        new JanelaDeJogo(new CampoMinado(9,9, 10));
+        new JanelaDeJogo(new CampoMinado(9,9, 10), recordesFacil);
     }
     private void btnJogoMedioActionPerformed(ActionEvent e) {
-        new JanelaDeJogo(new CampoMinado(16,16, 40));
+        new JanelaDeJogo(new CampoMinado(16,16, 40), recordesMedio);
     }
     private void btnJogoDificilActionPerformed(ActionEvent e) {
-        new JanelaDeJogo(new CampoMinado(16,30, 90));
+        new JanelaDeJogo(new CampoMinado(16,30, 90), recordesDificil);
     }
 }
